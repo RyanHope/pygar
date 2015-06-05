@@ -5,6 +5,7 @@ from buffer import Buffer
 from cell import Cell
 import random
 import time
+import math
 
 class Bot(object):
 
@@ -106,14 +107,15 @@ class Bot(object):
         all.extend(self.session.inbound)
         self.session.inbound = self.session.inbound[len(all):]
 
-        self.n_updates += len(all)
+        if (len(all) != 0):
+          self.n_updates += 1
 
         # parse all data
         for data in all:
             self.buffer.fill(data)
             packet = self.buffer.read_byte()
             self.parse_packet(packet)
-
+        
         if not self.last_update == self.game.timestamp:
             # if we didn't receive an update this tick, we dont need to check for destroys.
             return
@@ -201,6 +203,7 @@ class Bot(object):
     # version 520
     def parse_updates(self):
         b = self.buffer
+        current_time = time.time()
         while True:
             id = b.read_int()
 
@@ -244,8 +247,34 @@ class Bot(object):
 
                 # update global cell
                 cell = self.game.get_cell(id)
-                cell.x = x
-                cell.y = y
+                #print(str(current_time - cell.last_update))
+
+                t = current_time - cell.last_update
+
+                if (t > 0.0):
+
+                  vx = (float(x) - float(cell.x))/t
+                  vy = (float(y) - float(cell.y))/t
+
+                  cell.vx = (vx + cell.vx)/2.0
+                  cell.vy = (vy + cell.vy)/2.0
+
+                  v = math.sqrt(cell.vx*cell.vx + cell.vy*cell.vy)
+                  max_velocity = 800
+
+                  if v > max_velocity:
+                    cell.vx *= (max_velocity/v)
+                    cell.vy *= (max_velocity/v)
+                    cell.x = x
+                    cell.y = y
+                  else:
+                    cell.x += cell.vx*t
+                    cell.y += cell.vy*t
+
+                  cell.interpolated_x = cell.x
+                  cell.interpolated_y = cell.y
+                  cell.last_update = current_time
+                
                 cell.size = size
                 cell.color = color
                 cell.virus = virus
@@ -370,6 +399,20 @@ class Bot(object):
                 amount += 1
         amount = max(1, amount)  # prevent div by zero
         return x/amount, y/amount
+
+    def get_interpolated_center(self, current_time):
+      x = 0
+      y = 0
+      amount = 0
+      for id in self.ids:
+        cell = self.game.get_cell(id)
+        if cell:
+          x += cell.interpolated_x
+          y += cell.interpolated_y
+          amount += 1
+      amount = max(1, amount)
+      return x/float(amount), y/float(amount)
+
 
     def get_mass(self):
         mass = 0
