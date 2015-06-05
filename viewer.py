@@ -70,11 +70,10 @@ class GameViewer(object):
         pygame.quit()
 
     def render(self):
-        if self.scale == 0:
-            self.scale = self.game.view_w / 800
-            if self.scale == 0:
-              self.scale = 2
-         
+        scale = self.game.view_w / 800
+        if scale == 0:
+            scale = 2
+
         # handle events (user input)
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -172,6 +171,7 @@ class GameViewer(object):
                   text_rect.centery = int((cell.y - cell.size - y)/scale - 5 + self.height/2) 
                 self.screen.blit(text, text_rect)
 
+            if cell.size > 20 and not cell.virus:
                 # render mass under cell
                 num = str(round(cell.size))
                 if self.render_special:
@@ -185,7 +185,7 @@ class GameViewer(object):
                   text_rect.centerx = int((cell.x - x)/scale + self.width/2)
                   text_rect.centery = int((cell.y - y + cell.size)/scale + (self.font_size/2) + self.height/2)
                 self.screen.blit(text, text_rect)
-                
+
                 if self.render_special:
                     text = self.font.render(str(len(cell.watchers)), 0, color)
                     text_rect = text.get_rect()
