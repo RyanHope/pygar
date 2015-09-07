@@ -1,3 +1,6 @@
+# THIS PROJECT IS ABANDONED
+Issue reports and merge requests will be ignored.
+
 # Pygar
 An Agar.io client written in Python 3.4.3. See dependencies for things you need to install to use the client. To launch it, run "test.py".
 
