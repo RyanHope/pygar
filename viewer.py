@@ -1,5 +1,7 @@
 __author__ = 'RAEON'
 
+import os
+os.environ['PYGAME_FREETYPE'] = '1'
 import pygame
 from pygame.locals import *
 from time import time, sleep
@@ -20,7 +22,7 @@ class GameViewer(object):
         # background (black)
         self.background = pygame.Surface(self.resolution)
         self.background.convert()
-        self.background.fill((0, 0, 0))
+        self.background.fill((255, 255, 255))
 
         # font
         pygame.font.init()
@@ -37,15 +39,15 @@ class GameViewer(object):
         self.bot_updates = 0
 
         # render flags
-        self.render_special = False
+        self.render_special = True
 
         self.scale = 0
 
         # center view on bot
-        self.centered = False
+        self.centered = True
 
         # display game data
-        self.display_data = False
+        self.display_data = True
 
     def run(self):
         lastsecondtick = time()
@@ -73,9 +75,10 @@ class GameViewer(object):
     def render(self):
         if self.scale == 0:
             self.scale = self.game.view_w / 800
+            print self.scale
             if self.scale == 0:
-              self.scale = 2
-        
+                self.scale = 2
+
         current_time = time()
 
         # handle events (user input)
@@ -120,8 +123,8 @@ class GameViewer(object):
               if event.button == 5:
                 if self.centered:
                   self.scale *= 1.1
-        
-        
+
+
         # handle output (rendering)
 
         # clear screen
@@ -138,7 +141,7 @@ class GameViewer(object):
             cell.update_interpolation(current_time)
 
             # draw circle
-            # print('[cell]', cell.x/scale, cell.y/scale, cell.color, cell.size/scale, scale)
+            #print('[cell]', cell.x/scale, cell.y/scale, cell.color, cell.size/scale, scale)
 
             # get our own smallest cells size
             smallest_size = 0
@@ -156,20 +159,18 @@ class GameViewer(object):
 
             bot = self.game.bots[0]
             x, y = bot.get_interpolated_center(current_time)
-           
+
             # draw cell
             if (self.centered == False):
+                print (cell.interpolated_x,cell.interpolated_y,cell.size)
+                print (cell.interpolated_x/scale,cell.interpolated_y/scale)
                 if int(cell.size/scale) > 10:
-                  pygame.gfxdraw.aacircle(self.screen, int(cell.interpolated_x/scale), int(cell.interpolated_y/scale), int(cell.size/scale), cell.color)
+                    pygame.gfxdraw.aacircle(self.screen, int(cell.interpolated_x/scale), int(cell.interpolated_y/scale), int(cell.size/scale), cell.color)
                 pygame.gfxdraw.filled_circle(self.screen, int(cell.interpolated_x/scale), int(cell.interpolated_y/scale), int(cell.size/scale), cell.color)
             else:
                 if int(cell.size/scale) > 10:
-                  pygame.gfxdraw.aacircle(self.screen, int((cell.interpolated_x - x)/scale + self.width/2),
-                                                             int((cell.interpolated_y - y)/scale + self.height/2),
-                                                             int(cell.size/scale), cell.color)
-                pygame.gfxdraw.filled_circle(self.screen, int((cell.interpolated_x - x)/scale + self.width/2),
-                                                             int((cell.interpolated_y - y)/scale + self.height/2),
-                                                             int(cell.size/scale), cell.color)
+                    pygame.gfxdraw.aacircle(self.screen, int((cell.interpolated_x - x)/scale + self.width/2), int((cell.interpolated_y - y)/scale + self.height/2), int(cell.size/scale), cell.color)
+                pygame.gfxdraw.filled_circle(self.screen, int((cell.interpolated_x - x)/scale + self.width/2), int((cell.interpolated_y - y)/scale + self.height/2), int(cell.size/scale), cell.color)
 
             # draw name
             if cell.name is not '':
@@ -182,7 +183,7 @@ class GameViewer(object):
                   text_rect.centery = int((cell.interpolated_y - cell.size)/scale - 5)
                 else:
                   text_rect.centerx = int((cell.interpolated_x - x)/scale + self.width/2)
-                  text_rect.centery = int((cell.interpolated_y - cell.size - y)/scale - 5 + self.height/2) 
+                  text_rect.centery = int((cell.interpolated_y - cell.size - y)/scale - 5 + self.height/2)
                 self.screen.blit(text, text_rect)
 
             if cell.size > 20 and not cell.virus:
@@ -257,7 +258,7 @@ class GameViewer(object):
         if hasattr(ladder, 'values'):
           for name in ladder.values():
               i += 1
-              text = self.font.render(name + ' #' + str(i), 0, (255, 255, 255))
+              text = self.font.render(name.encode('utf-8', 'ignore') + ' #' + str(i), 0, (0, 0, 0))
               text_rect = text.get_rect()
               text_rect.right = x
               text_rect.top = y
@@ -268,28 +269,28 @@ class GameViewer(object):
 
       y = 0
 
-      text = self.font.render("frames per second : " + str(self.fps), 0, (255, 255, 255))
+      text = self.font.render("frames per second : " + str(self.fps), 0, (0, 0, 0))
       text_rect = text.get_rect()
       text_rect.left = 0
       text_rect.top = y
       self.screen.blit(text, text_rect)
       y += self.font_size
 
-      text = self.font.render("updates per second : " + str(self.bot_updates), 0, (255, 255, 255))
+      text = self.font.render("updates per second : " + str(self.bot_updates), 0, (0, 0, 0))
       text_rect = text.get_rect()
       text_rect.left = 0
       text_rect.top = y
       self.screen.blit(text, text_rect)
       y += self.font_size
 
-      text = self.font.render("number of bots : " + str(len(self.game.bots)), 0, (255, 255, 255))
+      text = self.font.render("number of bots : " + str(len(self.game.bots)), 0, (0, 0, 0))
       text_rect = text.get_rect()
       text_rect.left = 0
       text_rect.top = y
       self.screen.blit(text, text_rect)
       y += self.font_size
 
-      text = self.font.render("number of cells : " + str(len(self.game.cells)), 0, (255, 255, 255))
+      text = self.font.render("number of cells : " + str(len(self.game.cells)), 0, (0, 0, 0))
       text_rect = text.get_rect()
       text_rect.left = 0
       text_rect.top = y

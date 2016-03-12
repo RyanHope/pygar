@@ -18,6 +18,8 @@ class Session(object):
         self.inbound = []
 
     def connect(self, host, port):
+        self.host = host
+        self.port = port
         if not self.is_connected():
             if type(port) == int:
                 port = str(port)
@@ -62,8 +64,10 @@ class Session(object):
                     data = self.ws.recv()
                     self.inbound.append(data)
             except Exception as ex:
-                print('[session] run (' + str(self.ws.connected) + '): ' + str(ex))
-                return
+                print("disconnecting...")
+                self.ws.close()
+                self.inbound = []
+                print("disconnected, please wait for reconnection")
 
     def read(self):
         if self.is_connected():
@@ -75,8 +79,10 @@ class Session(object):
 
     def write(self, data):
         if self.is_connected():
-            if type(data) == bytearray:
-                data = bytes(data)  # no reason to do this
+            # if type(data) == bytearray:
+            #     data = bytes(data)  # no reason to do this
+
+            print("TITS",data)
 
             if len(data) > 0:
                 try:

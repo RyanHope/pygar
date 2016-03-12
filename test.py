@@ -1,5 +1,6 @@
 __author__ = 'RAEON'
 
+import sys
 import argparse
 import requests
 import json
@@ -23,14 +24,17 @@ if args.ip or args.port:
         exit(1)
 else:
     r = requests.post('http://m.agar.io/', data='EU-London')
-    print(r.text)
-    ip, port = r.text.split(':')
+    print r.text
+    hostip, token, _ = r.text.split('\n')
+    ip, port = hostip.split(':')
+    port = int(port)
 
 # server = Server()
 
+print("TOKEN",token,len(token))
 
 game = Game(None)
-game.start(ip, port)
+game.start(ip, port, token)
 for i in range(args.bots):
     game.add_bot()
 

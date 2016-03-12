@@ -37,7 +37,7 @@ class Game(object):
         # our bots that are in this game
         self.bots = []
 
-    def start(self, host, port):
+    def start(self, host, port, token):
         if not self.running:
             self.running = True
 
@@ -45,6 +45,7 @@ class Game(object):
             self.timestamp = time.time()
             self.host = host
             self.port = port
+            self.token = token
 
             self.ids = []
             self.cells = {}
@@ -112,7 +113,7 @@ class Game(object):
                 self.remove_cell(id)
 
     def add_bot(self):
-        bot = Bot(self)
+        bot = Bot(self, self.token)
         self.bots.append(bot)
         if self.running:
             bot.connect(self.host, self.port)
@@ -128,17 +129,17 @@ class Game(object):
             self.bots.remove(lowest)
             return True
         return False
-    
+
     # version 520
     def transfer(self, game):
         # transfer everyting from this self to game
-        
+
         game.pause = True
         self.pause = True
 
         while not (game.paused and self.paused):
             pass
-        
+
         for id in self.ids:
             if not game.has_id(id):
                 game.add_id(id)
@@ -190,7 +191,7 @@ class Game(object):
         # unpause game
         self.pause = False
         game.pause = False
-    
+
     # version 520
     def transfer_bot(self, bot, game):
         self.pause = True
@@ -206,14 +207,14 @@ class Game(object):
         for id in bot.ids:
             self.remove_id(id)
             game.add_id(id)
-        
+
         # move over all cells seen by this bot
         for old in self.cells:
             if old.has_watcher(bot):
                 # cell is seen by this bot
                 # remove bot from watchers
                 old.remove_watcher(bot)
-                
+
                 # check if the other game has it
                 if game.has_cell(old.id):
                     # it does
@@ -228,7 +229,7 @@ class Game(object):
                     cell.add_watcher(bot)
 
                     # add cell to game
-                    game.add_cell(cell)      
+                    game.add_cell(cell)
 
     def get_bot_count(self):
         return len(self.bots)

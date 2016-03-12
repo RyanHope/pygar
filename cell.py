@@ -4,7 +4,7 @@ from time import time
 
 class Cell(object):
 
-    def __init__(self, id, x, y, size, color, virus, agitated, name):
+    def __init__(self, id, x, y, size, color, virus, agitated, name, skin_url):
         self.id = id
         self.x = x
         self.y = y
@@ -20,6 +20,7 @@ class Cell(object):
         self.virus = virus
         self.agitated = agitated
         self.name = name
+        self.skin_url = skin_url
         self.watchers = []
         self.owner = None
         self.timestamp = None
