@@ -76,7 +76,7 @@ class Game(object):
     def update(self):
         act = False
         last_act = 0
-        while True:
+        while self.running:
             if self.pause:
                 self.paused = True
                 while self.pause:

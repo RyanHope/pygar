@@ -41,7 +41,7 @@ class Bot(object):
         self.mode = 'ffa'
 
     def connect(self, host, port):
-        if not self.is_connected() and (time.time() - self.game.last_connect > 15):
+        if self.game.is_running() and not self.is_connected() and (time.time() - self.game.last_connect > 15):
             if self.session.connect(host, port):
                 print('[' + self.name + '] Connected')
                 # reset game variables
@@ -131,7 +131,7 @@ class Bot(object):
         pass
 
     def parse_packet(self, id):
-        print("====",id,"====")
+        #print("====",id,"====")
         b = self.buffer
         if id == 16:
             self.last_update = self.game.timestamp
@@ -179,8 +179,8 @@ class Bot(object):
         elif id == 64:
             self.game.view_x = self.view_x = b.read_double()
             self.game.view_y = self.view_y = b.read_double()
-            self.game.view_w = self.view_w = b.read_double()# - self.game.view_x
-            self.game.view_h = self.view_h = b.read_double()# - self.game.view_y
+            self.game.view_w = self.view_w = b.read_double() - self.game.view_x
+            self.game.view_h = self.view_h = b.read_double() - self.game.view_y
             print('[64] viewport:', self.view_x, self.view_y, self.view_w, self.view_h)
             if len(b.input) > 0:
                 self.game_mode = b.read_uint()

@@ -44,7 +44,7 @@ class GameViewer(object):
         self.scale = 0
 
         # center view on bot
-        self.centered = True
+        self.centered = False
 
         # display game data
         self.display_data = True
@@ -54,7 +54,7 @@ class GameViewer(object):
         while True:
           if (time() - self.last_time) > 0.0:
 
-            self.render()
+            if not self.render(): break
 
             # check to see if an entire second has passed in order to
             # increment fps counter and bot updates counter
@@ -71,6 +71,7 @@ class GameViewer(object):
             self.last_time = time()
 
         pygame.quit()
+        self.game.stop()
 
     def render(self):
         if self.scale == 0:
@@ -162,8 +163,6 @@ class GameViewer(object):
 
             # draw cell
             if (self.centered == False):
-                print (cell.interpolated_x,cell.interpolated_y,cell.size)
-                print (cell.interpolated_x/scale,cell.interpolated_y/scale)
                 if int(cell.size/scale) > 10:
                     pygame.gfxdraw.aacircle(self.screen, int(cell.interpolated_x/scale), int(cell.interpolated_y/scale), int(cell.size/scale), cell.color)
                 pygame.gfxdraw.filled_circle(self.screen, int(cell.interpolated_x/scale), int(cell.interpolated_y/scale), int(cell.size/scale), cell.color)
